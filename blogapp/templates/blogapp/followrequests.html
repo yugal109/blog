@@ -1,0 +1,69 @@
+{% extends 'blogapp/base.html' %} {%load static %} {% block title %}
+<title>Follow Requests </title>
+{% endblock %}  
+
+{% block content %}
+<div  class="Blog-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="Blogheading">
+            <h3></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- section --><p></p>
+  <div style="height:90vh ;display: flex;justify-content: center;align-items: center;" style="margin:30px">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 offset-md-2">
+          <div class="full">
+            
+            <div class="blog_cont_2">
+              <h1>FOLLOW REQUESTS</h1>
+              <hr/>
+
+              
+              {% for freq in follow_requests %}
+              <div style="display: flex;justify-content: space-between;align-items: center;">
+
+               <div>
+                <img style="
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;" src="{{freq.requestor.image}}" alt="Avatar" class="avatar">
+            
+                {{freq.requestor.user.username }} has requested to follow you.
+
+               </div> 
+
+               <div>
+ 
+               <form method="post">{% csrf_token %}
+  
+        <input type="text" name="requestId" value={{freq.followrequestId}} hidden />
+        <input type="text" name="requestor" value={{freq.requestor.user.id}} hidden />
+        
+        
+              <button name="accept" style="padding:10px;font-weight: 600;color:white;background-color:rgb(63, 165, 165)">Accept</button>
+              
+              <button name="cancel" style="padding:10px;font-weight: 600;color:white;background-color:rgb(248, 4, 45)">Cancel</button>
+            </form>
+            </div>
+        </div>
+              <hr/>
+              {% endfor %}
+
+            
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

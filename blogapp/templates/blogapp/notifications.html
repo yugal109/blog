@@ -1,0 +1,181 @@
+{% extends 'blogapp/base.html' %} {%load static %} {% block title %}
+<title>Notifications</title>
+{% endblock %} {% block content %}
+
+<div class="Blog-bg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="Blogheading">
+          <h3></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- section -->
+<div
+  style="
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  "
+  style="margin: 30px"
+>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="full">
+          <div class="blog_cont_2">
+            <h1>NOTIFICATIONS</h1>
+            <hr />
+            {% for noti in notifications %}
+
+         
+                {% ifequal noti.notification_type 'comment' %}
+                <form method="post">{% csrf_token %}
+                  <div style="display: flex;justify-content: space-between;">
+                <p style="display: flex;align-items: center;">
+                  <a href="{% url 'profile' noti.reactor.user.id %}">
+                    <img
+                style="
+                  vertical-align: middle;
+                  width: 30px;
+                  height: 30px;
+                  border-radius: 50%;
+                  margin-right: 10px;
+                "
+                src="{{noti.reactor.image}}"
+                alt="Avatar"
+                class="avatar"
+              />
+                  </a>
+             
+                  {{noti.reactor.user.username}}  commented on your post.
+                </p>
+                <button
+                  style="
+                    padding: 5px;
+                    background-color: rgb(59, 192, 148);
+                    color: white;
+                    font-weight: 600;
+                  "
+                >
+                  Go to post
+                </button>
+              </div>
+            </form>
+              {% endifequal %}
+                
+
+              {% ifequal noti.notification_type 'reply' %}
+              <!-- <form method="post">{% csrf_token %} -->
+                <div style="display: flex;justify-content: space-between;">
+              <p style="display: flex;align-items: center;">
+                <a href="{% url 'profile' noti.reactor.user.id %}">
+                  <img
+              style="
+                vertical-align: middle;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                margin-right: 10px;
+              "
+              src="{{noti.reactor.image}}"
+              alt="Avatar"
+              class="avatar"
+            />
+                </a>
+           
+                {{noti.reactor.user.username}} replied to the your comment in a
+                post of {{noti.comment.profile.user.username}}.
+              </p>
+              <button
+                style="
+                  padding: 5px;
+                  background-color: rgb(59, 192, 148);
+                  color: white;
+                  font-weight: 600;
+                "
+              >
+                Go to post
+              </button>
+            </div>
+          <!-- </form> -->
+
+
+              {% endifequal %}
+           
+            
+
+            {% ifequal noti.notification_type 'likepost' %}
+
+            <div style="display: flex;justify-content: space-between;">
+              <p style="display: flex;align-items: center;">
+                <a href="{% url 'profile' noti.reactor.user.id %}">
+                  <img
+              style="
+                vertical-align: middle;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                margin-right: 10px;
+              "
+              src="{{noti.reactor.image}}"
+              alt="Avatar"
+              class="avatar"
+            />
+                </a>
+                {{noti.reactor.user.username}} liked your post. 
+              </p>
+              <button
+                style="
+                  padding: 5px;
+                  background-color: rgb(59, 192, 148);
+                  color: white;
+                  font-weight: 600;
+                "
+              >
+                Go to post
+              </button>
+            </div>
+              {% endifequal %}
+          
+
+            <hr />
+            {%endfor%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+<!-- <div
+  style="
+    height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  "
+  style="margin: 30px"
+>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="full">
+          <div class="blog_cont_2">
+            <h1>NOTIFICATIONS</h1>
+            <hr />
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->

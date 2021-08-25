@@ -1,0 +1,151 @@
+{% extends 'blogapp/base.html' %} 
+
+{%load static %} 
+
+{% block title %}
+<title>Write</title>
+{% endblock %}
+
+{% block css %}
+<style>
+   input{
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.updateButton{
+    padding:10px;
+    margin-top: 20px;
+    width:100%;
+    background-color: rgb(54, 190, 190);
+    color:white;
+    font-weight: 600;
+}
+
+
+.head{
+   display: flex;
+   justify-content: center;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="Blog-bg">
+   <div class="container">
+     <div class="row">
+       <div class="col-md-12">
+         <div class="Blogheading">
+           <h3></h3>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+ 
+ <div style="margin: 60px;padding:50px">
+
+  
+    <div  class="head">
+     <h1>CREATE BLOG</h1>
+
+    </div>
+   <hr />
+   <form method="post">{% csrf_token %}
+
+    <input style="margin-bottom: 20px;" type="text" name="title" placeholder="Title" required="" />
+
+    <textarea name="editor1"></textarea>
+
+      <input id="imgURL" type="text" name="imgURL" hidden  />
+
+      <input id="files" type="file"  />
+                         
+      <div id="uploadButton" class="center">
+        <button type="button" class="updateButton" onClick="uploadimage()">Upload</button>
+     </div>
+
+     <div id="postButton" style="display: none;" class="center">
+        <button type="submit" class="updateButton">Post</button>
+     </div>
+
+
+   </form>
+ </div>
+  
+
+
+
+
+  </div>
+
+
+
+
+
+
+{% endblock %}
+
+
+{% block js %}
+
+
+
+<script>
+  CKEDITOR.replace( 'editor1' );
+</script>
+
+
+<script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+
+
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyBm58arLBCxHkwApxSQzDBSaQJFetuPM-Y",
+    authDomain: "voice-43ab9.firebaseapp.com",
+    databaseURL: "https://voice-43ab9-default-rtdb.firebaseio.com",
+    projectId: "voice-43ab9",
+    storageBucket: "voice-43ab9.appspot.com",
+    messagingSenderId: "211438195730",
+    appId: "1:211438195730:web:29ca5996d375fb0fcf74cb",
+    measurementId: "G-QP0J48W61L",
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  function uploadimage() {
+ 
+    document.getElementById("uploadButton").innerHTML=
+    `<button type="button" class="updateButton" >Uploading.....</button>`
+
+    var storage = firebase.storage();
+    var file = document.getElementById("files").files[0];
+    var storageref = storage.ref();
+    var thisref = storageref.child(file.name).put(file);
+    thisref.on(
+      "state_changed",
+      function (snapshot) {
+        console.log("Done");
+      },
+      function (error) {
+        console.log("Error", error);
+      },
+      function () {
+        // Uploaded completed successfully, now we can get the download URL
+        thisref.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+          console.log("File available at", downloadURL);
+          document.getElementById("uploadButton").style.display="none"
+          document.getElementById("imgURL").value = downloadURL;
+          document.getElementById("postButton").style.display="block"
+          
+        
+        });
+      }
+    );
+  }
+</script>
+
+
+{%endblock%}

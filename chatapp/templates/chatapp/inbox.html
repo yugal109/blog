@@ -1,0 +1,61 @@
+{% extends 'blogapp/base.html' %} {%load static %} {% block title %}
+<title>Inbox</title>
+{% endblock %} {% block content %}
+
+<div class="Blog-bg">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="Blogheading">
+            <h3></h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- section -->
+  <div
+    style="
+      height: 90vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    "
+    style="margin: 30px"
+  >
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 offset-md-2">
+          <div class="full">
+            <div class="blog_cont_2">
+              <h1>INBOX</h1>
+              <hr />
+              
+              {% for inbox in inbox_list %}
+              <a href="{% url 'messagesRoom' inbox.roomId %}">
+                {% ifequal inbox.user1.user.username user.username  %}
+                <div>
+                 <b>{{inbox.user2}}</b> 
+                </div>
+                {% else %}
+                <div>
+                  <b>{{inbox.user1}}</b> 
+                 
+                </div>
+                {% endifequal %}
+                {{inbox.latestMessage}}
+                <hr/>
+                
+              </a>
+              {% endfor %}
+             
+             
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>{% endblock %}

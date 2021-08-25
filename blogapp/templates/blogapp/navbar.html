@@ -1,0 +1,66 @@
+<header style="position:fixed;width:100%;z-index: 100;" >
+  <!-- header inner -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-3 logo_section">
+        <div class="full">
+          <div class="center-desk">
+            <div class="logo">
+              <a href="{% url 'home' %}"
+                >
+                <img src="/media/images/logo.png" alt="#"/>
+              
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-9">
+        <div class="menu-area">
+          <div class="limit-box">
+            <nav class="main-menu">
+              <ul class="menu-area-main">
+                <li class="active">
+                  <a href="{% url 'home' %}">Home</a>
+                </li>
+                <li>
+                  <a href="{% url 'about' %}">About</a>
+                </li>
+                
+                {% if user.is_authenticated%}
+                <li>
+                  <a href="{% url 'createblog' %}">Create Blog</a>
+                </li>
+                <li>
+                  <a href="{% url 'notifications' %}">Notifications ({{request.notilength}})</a>
+                </li>
+                <li>
+                  <a href="{% url 'followrequests' %}">Follow Requests</a>
+                </li>
+                <li>
+                  <a href="{% url 'logout' %}">Logout</a>
+                </li>
+                <li>
+                  <a href="{% url 'profile' id=user.id %}">{{user.username}}</a>
+                </li>
+                {% else %}
+                <li>
+                  <a href="{% url 'login' %}">Login</a>
+                </li>
+                <li>
+                  <a href="{% url 'register' %}">Register</a>
+                </li>
+
+                {% endif %}
+                <!-- <a href="#"><img src="/media/images/search_icon.png" alt="#" /></a> -->
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end header inner -->
+</header>
+
+

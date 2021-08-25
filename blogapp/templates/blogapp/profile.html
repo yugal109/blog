@@ -1,0 +1,292 @@
+{% extends 'blogapp/base.html' %} {%load static %} {% block title %}
+<title>Profile | {{user.username}}</title>
+{% endblock %} 
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/profile.css' %}">
+<style>
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+</style>
+{% endblock %} {% block content %}
+
+<div style="padding-top:80px" class="container">
+  <div class="profile">
+
+    <div class="profile-image">
+      <img src="{{profile.image}}" alt="Avatar" class="avatar" />
+    </div>
+
+    <div class="profile_bio" >
+      <h1 class="profile-user-name">{{profile.user.username}}</h1>
+
+  {% ifequal profile.user user %}
+
+
+  <button class="btn profile-edit-btn" data-toggle="modal" data-target="#exampleModalCenter">
+  Edit Profile 
+  </button>
+<!-- Rounded switch -->
+<label  style="margin-top: 5px;margin-left: 5px;" class="switch">
+  <input type="checkbox">
+  <span class="slider round"></span>
+</label>
+
+  {% endifequal %}
+
+
+      <!-- <button class="btn profile-settings-btn" aria-label="profile settings"><i class="fas fa-cog" aria-hidden="true"></i></button> -->
+    </div>
+
+    <!-- <button class="btn profile-edit-btn">{{profile.accountType}}</button> -->
+
+
+    <div class="profile-stats">
+      <ul>
+        <li><span class="profile-stat-count">{{profile.posts_length}}</span> posts</li>
+        <li><span class="profile-stat-count">{{profile.total_followers}}</span> followers</li>
+        <li><span class="profile-stat-count">{{profile.total_following}}</span> following</li>
+      </ul>
+    </div>
+
+
+
+    <div class="profile-bio">
+      <p>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h2>Update Profile</h2>
+        <hr/>
+             <form method="post">{% csrf_token %}
+              <input name="username" style="width: 100%;margin-top: 10px;font-size: 17px;padding:7px " type="text"  name="" value="{{profile.user.username}}">
+              <input name="firstname" style="width: 100%;margin-top: 10px;font-size: 17px;padding:7px " type="text"  name="" value="{{profile.user.first_name}}">
+              <input name="lastname" style="width: 100%;margin-top: 10px;font-size: 17px;padding:7px " type="text"  name="" value="{{profile.user.last_name}}">
+              <input name="email" style="width: 100%;margin-top: 10px;font-size: 17px;padding:7px " type="text"  name="" value="{{profile.user.email}}">
+              <input name="accountType" style="width: 100%;margin-top: 10px;font-size: 17px;padding:7px " type="text"  name="" value="{{profile.accountType}}">
+              <hr/>
+              <div>
+                <button type="submit" name="editprofile" style="padding:10px;
+
+                  width:100%;
+                  background-color: rgb(54, 190, 190);
+                  color:white;
+                  font-weight: 600;"
+
+    >Update</button>
+              </div>
+              </form>
+
+      </div>
+      
+    </div>
+  </div>
+</div>
+        <span class="profile-real-name">{{profile.user.first_name}} {{profile.user.last_name}}
+        
+        </span>
+        
+        {{profile.bio}} 📷✈️🏕️
+
+      </p>
+    </div>
+    <div style="display: flex;flex-direction: column;">
+      <button style="margin-top:20px" class="btn profile-edit-btn">{{profile.accountType}}</button>
+
+      {% if user.id == profile.user.id %}
+      {% else %}
+      
+      {% if user in profile.followers.all %}
+      <button style="margin-top:20px" class="btn profile-edit-btn">Following</button>
+
+      <form method="post">{% csrf_token %}
+        
+        <input type="text" 
+        name="acceptor" 
+        value="{{profile.profileId}}" hidden />
+
+        <button name="unfollow" style="margin-top:20px;color:white;background-color: rgb(42, 190, 141);" class="btn profile-edit-btn">Unfollow</button>
+      </form>
+      <form method="post">{% csrf_token %}
+
+        <input type="text" 
+        name="roomname" 
+        value="{{profile.user.username}},{{user.username}}" hidden />
+
+        <button  name="message" style="margin-top:20px;color:white;background-color: rgb(42, 190, 141);" class="btn profile-edit-btn">Message</button>
+
+      </form>
+
+      
+      {% else %}
+
+      {% if follow_requests %}
+      {% ifequal follow_requests.status 'pending' %}
+    
+        <button style="margin-top:20px;color: white;background-color: rgb(66, 206, 206);" class="btn profile-edit-btn">
+          Pending</button>
+  
+      {% endifequal %}
+
+      {% else %}
+      <form method="post">{% csrf_token %}
+
+        <input type="text" 
+        name="acceptor" 
+        value="{{profile.profileId}}" hidden /> 
+        
+        <button  name="following" 
+         style="margin-top:20px;color: white;background-color: rgb(66, 206, 206);"
+         class="btn profile-edit-btn">Follow</button>
+         
+         {% ifequal profile.accountType 'public' %}
+         <form method="post">{% csrf_token %}
+
+          <input type="text" 
+          name="roomname" 
+          value="{{profile.user.username}},{{user.username}}" hidden />
+  
+          <button  name="message" style="margin-top:20px;color:white;background-color: rgb(42, 190, 141);" class="btn profile-edit-btn">Message</button>
+  
+        </form>
+
+         {% endifequal%}
+
+
+
+      </form>
+      {% endif %}
+      
+      
+
+
+      {% endif %}
+      {% endif%}
+
+
+    </div>
+  
+  </div>
+  <!-- End of profile section -->
+</div>
+<!-- End of container -->
+
+{% if not private or user in profile.followers.all  %}
+
+<main>
+
+  <div class="container">
+    <div class="gallery">
+
+    {% for post in profile.all_posts %}
+   <a href="{% url 'blog' post.postId %}">
+      <div style="width:fit-content" class="gallery-item" tabindex="0">
+        <img
+          src="{{post.imageURL}}"
+          class="gallery-image"
+          alt=""
+        />
+
+        <div class="gallery-item-info">
+          <ul>
+            <li class="gallery-item-likes">
+              <i style="color:white" class="material-icons">favorite</i>
+
+              {{post.likeslength}}
+            </li>
+            <li class="gallery-item-comments">
+              <i style="color:white" class="material-icons">comment</i>
+
+              {{post.comments_length}}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </a>
+{% endfor %}
+
+    </div>
+
+   
+    <!-- End of gallery -->
+  </div>
+  <!-- End of container -->
+</main>
+{% endif %}
+{% endblock %}
+{% block js %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+{% endblock %}
+

@@ -1,0 +1,114 @@
+{% extends 'blogapp/base.html' %} 
+{% load socialaccount %}
+{%load static %} 
+
+{% block title %}
+<title>Login</title>
+{% endblock %}
+
+{% block css %}
+<style>
+   input{
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.head{
+   display: flex;
+   justify-content: center;
+}
+
+#updateButton{
+    padding:10px;
+    margin-top: 20px;
+    width:100%;
+    background-color: rgb(54, 190, 190);
+    color:white;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="Blog-bg">
+   <div class="container">
+     <div class="row">
+       <div class="col-md-12">
+         <div class="Blogheading">
+           <h3></h3>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+ 
+ <!-- section -->
+ <div
+   style="
+     height: 90vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+   "
+   style="margin: 30px"
+ >
+   <div class="container">
+     <div class="row">
+       <div class="col-md-8 offset-md-2">
+         <div class="full">
+           <div class="blog_cont_2">
+              <div class="head">
+               <h1>LOGIN</h1>
+
+              </div>
+             <hr />
+             <div style="display: flex;justify-content: center;padding:10px;color:red;font-weight: 600;">
+             {{error}}
+               
+             </div>
+             <a href="{% provider_login_url 'google' %}">
+              <button  id="updateButton">Login with Google
+                <img src="/media/icons/google (1).png"/>
+              </button>
+              
+
+
+             </a>
+                            <br/>
+                            <hr/>
+             <div style="display:flex;justify-content: center;">OR</div>
+             <hr/>
+             <form method="post">{% csrf_token %}
+                 <div>
+                     <input placeholder="Username" name="username" type="text"  required/>
+                     <!-- <input type="file" /> -->
+                     <input placeholder="Password" name="password" type="password" required/>
+                     <!-- <input type="file" /> -->
+
+                   </div>
+                   <button type="submit" id="updateButton">Login</button>
+             </form>
+           
+             <div style="display: flex;justify-content: flex-end;margin-top: 10px">Don't have an account?<a href="{% url 'register'%}" style="margin-left: 5px;">  Register</a></div>
+             <div style="display: flex;justify-content: flex-end;margin-top: 10px"><a href="{% url 'forgotpassword'%}" style="margin-left: 5px;">Forgot Password?</a></div>
+
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+  document.getElementById("updateButton")
+  .addEventListener("click",()=>{
+    document.getElementById("updateButton").innerText="wait........"
+  })
+</script>
+{% endblock %}
+
+

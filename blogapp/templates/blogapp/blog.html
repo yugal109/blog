@@ -1,0 +1,579 @@
+{% extends 'blogapp/base.html' %} {%load static %} {% block title %}
+<title>Blog</title>
+{% endblock %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/blog.css' %}" />
+<link rel="stylesheet" href="{% static 'css/update.css' %}" />
+
+<style>
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  /* ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 5px;
+} */
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+  }
+</style>
+{% endblock %} {% block content %}
+
+<div class="Blog-bg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="Blogheading">
+          <h3></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+ 
+  <div class="blog_card">
+
+    <div style="margin-bottom: 20px;">
+      <img src="{{blog.imageURL}}"/>
+    </div>
+    <div style="display:flex;align-items:center;margin-left: -10px;">
+    <img
+    style="
+     
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+    "
+    src="{{blog.profile.image}}"
+    alt="Avatar"
+    class="avatar"
+  />
+    <p style="font-size: 40px;margin:10px 0 10px 0">
+      {{blog.title|capfirst}}
+    </p>
+  </div>
+    <div id="likesof{{blog.postId}}">
+    {% if user in blog.likes.all %}
+  
+    <button onclick="postUnlike('{{blog.postId}}')" style="background-color: white;">
+      <img  style="width:50px;height:50px" src="/media/icons/redheart.png">
+
+    </button>
+
+    {% else %}
+    <button onclick="postLike('{{blog.postId}}')" style="background-color: white;">
+      <img  style="width:50px;height:50px" src="/media/icons/heart.png">
+
+    </button>
+
+    {% endif %}
+  </div>
+  <div>
+    <span  id="likeslength">{{blog.likeslength}}</span> <span data-toggle="modal" data-target="#exampleModalCenterLikes" onclick="showAllLikes('{{blog.postId}}')">people like this.</span> 
+    <div style="margin-left: 5px" method="post">
+
+      <!-- MODAL -->
+    <div class="modal fade" id="exampleModalCenterLikes" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div  class="modal-content">
+          <div class="modal-header">
+            <div style="display: flex;justify-content: center;font-size: 30px;">Likes</div>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <ul style="height:600px ;overflow-y: scroll;"  id="likes_list" class="list-group">              
+              </ul>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    <p style="margin:10px 0 10px 0">
+      {{blog.created_at}}
+    </p>
+
+
+    <div class="blog_description">
+      {{blog.blog|safe}}
+    </div>
+<hr/>
+{% ifequal blog.profile.user user %}
+  <div style="display: flex;">
+      <div>
+      <button  style="
+      padding: 5px;
+      color: white;
+      font-weight: 600;
+      background-color: rgb(54, 190, 190);
+    ">
+        <a style="text-decoration: none;color: white;" href="{% url 'updateblog' blog.postId %}">Update</a>
+      </button>
+    </div>
+      <form method="post">{% csrf_token %}
+  
+  
+          <button name="deletebutton"  style="
+        
+          color: white;
+          font-weight: 600;
+          padding:5px;
+          margin-left: 5px;
+          background-color: rgb(226, 87, 32);
+        ">
+           Delete
+          </button>
+      </form>
+     
+
+  </div>
+{% endifequal %}
+</section>
+
+<!-- end s-content -->
+<hr />
+
+<!-- //COMMENT SECTIONS -->
+<!-- section -->
+<section class="layout_padding">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="heading" style="padding-left: 15px; padding-right: 15px">
+          <h4 style="border-bottom: solid #333 1px">
+            Comments : <span id="comment_length">{{length}}</span>
+          </h4>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div id="commets_list" class="col-md-12">
+        <!-- COMMENT SECTION -->
+        {% for comment in comments %}
+        <div id="commentid{{comment.commentId}}" class="full comment_blog_line">
+          <div class="row">
+            <div class="col-md-1">
+              <!-- <img src="{{comment.profile.image}}" alt="#" /> -->
+
+              <img
+                style="
+                  vertical-align: middle;
+                  width: 80px;
+                  height: 70px;
+                  border-radius: 50%;
+                "
+                src="{{comment.profile.image}}"
+                alt="Avatar"
+                class="avatar"
+              />
+            </div>
+            <div class="col-md-9">
+              <div class="full contact_text">
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 10px;
+                  "
+                >
+                  <h3>{{comment.profile.user.username}}</h3>
+                  {% ifequal comment.profile.user user%}
+
+                  <div style="margin-left: 5px" method="post">
+                    <button
+                      style="
+                        padding: 2px;
+                        color: white;
+                        font-weight: 600;
+                        background-color: rgb(54, 190, 190);
+                      "
+                      data-toggle="modal" data-target="#exampleModalCenter{{comment.commentId}}"
+                      >
+
+                      Update
+                    </button>
+                    <button
+                      onclick="deleteComment('{{comment.commentId}}')"
+                      style="
+                        padding: 2px;
+                        color: white;
+                        font-weight: 600;
+                        background-color: red;
+                      "
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  {% endifequal %}
+                </div>
+
+
+
+              <!-- Modal -->
+              <div class="modal fade" id="exampleModalCenter{{comment.commentId}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div  class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div>
+                        <input id="updateCommentField{{comment.commentId}}" type="text" value="{{comment.comment}}" >
+                      </div>
+                    </div>
+                    <div style="padding:10px">
+                     <button onclick="updateComment('{{comment.commentId}}')" id="updateButton">Update</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                           
+                <div id="actualComment{{comment.commentId}}">
+                {{comment.comment}}
+
+                </div>
+
+                <span style="font-size: 10px" ]>{{comment.created_at}}</span>
+                <div id="likescommentid{{comment.commentId}}">
+                  {%csrf_token%} {% if user in comment.likes.all %}
+                  <button
+                    name="likecomment"
+                    onClick="commentUnlike('{{comment.commentId}}')"
+                    style="background-color: white"
+                  >
+                    <img
+                      style="width: 18px; height: 18px"
+                      src="/media/icons/redheart.png"
+                    />
+                  </button>
+                  <input
+                    hidden
+                    name="comid"
+                    type="text"
+                    value="{{comment.commentId}}"
+                  />
+                  {% else %}
+                  <button
+                    name="likecomment"
+                    onClick="commentLike('{{comment.commentId}}')"
+                    style="background-color: white"
+                  >
+                    <img
+                      style="width: 18px; height: 18px"
+                      src="/media/icons/heart.png"
+                    />
+                  </button>
+                  <input
+                    hidden
+                    name="comid"
+                    type="text"
+                    value="{{comment.commentId}}"
+                  />
+
+                  {% endif %}
+                </div>
+                
+                <span id="commentlikeslength{{comment.commentId}}">{{comment.likeslength}}</span> 
+                <span data-toggle="modal" data-target="#exampleModalCenterLikesComment" onclick="showCommentLikes('{{comment.commentId}}')">likes in this comment.</span>
+                <br/>
+
+                      <!-- MODAL -->
+    <div class="modal fade" id="exampleModalCenterLikesComment" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div  class="modal-content">
+          <div class="modal-header">
+            <div style="display: flex;justify-content: center;font-size: 30px;">Likes</div>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div>
+              <ul style="height:600px ;overflow-y: scroll;"  id="comment_likes_list" class="list-group">              
+              </ul>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+    
+                <span>{{comment.replieslength}} replies in this comment.</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick="showReply('{{comment.commentId}}')"
+              class="reply_bt"
+            >
+              Show Replies
+            </button>
+
+            <div id="repliesof{{comment.commentId}}" style="display: none">
+              <h3>Replies</h3>
+              <hr />
+              <div id="replies_list{{comment.commentId}}">
+                <!-- //REPLIES  -->
+                {% for reply in comment.replies%}
+
+                <div id="replyid{{reply.replyId}}" style="display: flex">
+                  <div class="col-md-1">
+                    <img src="{{reply.profile.image}}" alt="#" />
+                    <!-- <img style="  vertical-align: middle;
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;" src="{{reply.profile.image}}" alt="Avatar" class="avatar"> -->
+                  </div>
+
+                  <div class="col-md-9">
+                    <div>
+                      <div
+                        style="
+                          display: flex;
+                          align-items: center;
+                          margin-bottom: 10px;
+                        "
+                      >
+                        <h3>{{reply.profile.user.username}}</h3>
+                        {% ifequal reply.profile.user user %}
+
+                        <div style="margin-left: 5px">
+                          <button
+                            style="
+                              padding: 2px;
+                              color: white;
+                              font-weight: 600;
+                              background-color: rgb(54, 190, 190);
+                            "
+                            data-toggle="modal" data-target="#exampleModalCenter{{reply.replyId}}"   
+                          >
+                            Update
+                          </button>
+                          <button
+                            onclick="deleteReply('{{reply.replyId}}')"
+                            style="
+                              padding: 2px;
+                              color: white;
+                              font-weight: 600;
+                              background-color: red;
+                            "
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        {% endifequal %}
+                      </div>
+
+
+                <div class="modal fade" id="exampleModalCenter{{reply.replyId}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <div>
+                        <input id="updateReplyField{{reply.replyId}}" type="text" value="{{reply.reply}}" >
+                      </div>
+                    </div>
+                    <div style="padding:10px">
+                     <button onclick="updateReply('{{reply.replyId}}')" id="updateButton">Update</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                           
+
+                      <h6>Posted on Jan 10 / 2017 at 06:53 am</h6>
+                      <!-- < style="font-size: 14px;"> -->
+
+                      <div id="likerepliesid{{reply.replyId}}">
+                        {% if user in reply.likes.all %}
+                        <button
+                          name="likereply"
+                          type="submit"
+                          style="background-color: white"
+                          onclick="replyUnlike('{{reply.replyId}}')"
+                        >
+                          <img
+                            style="width: 18px; height: 18px"
+                            src="/media/icons/redheart.png"
+                          />
+                        </button>
+                        <input
+                          hidden
+                          name="repid"
+                          type="text"
+                          value="{{reply.replyId}}"
+                        />
+                        {% else %}
+                        <button
+                          name="likereply"
+                          type="submit"
+                          style="background-color: white"
+                          onclick="replyLike('{{reply.replyId}}')"
+                        >
+                          <img
+                            style="width: 18px; height: 18px"
+                            src="/media/icons/heart.png"
+                          />
+                        </button>
+                        <input
+                          hidden
+                          name="repid"
+                          type="text"
+                          value="{{reply.replyId}}"
+                        />
+
+                        {% endif %}
+                      </div>
+                     <div id="actualReply{{reply.replyId}}">
+                      {{reply.reply}}
+                     </div>
+                    </div>
+                  </div>
+                  <hr />
+                </div>
+
+                {% endfor %}
+              </div>
+              <div
+                id="idof{{comment.commentId}}"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: flex-start;
+                "
+              ></div>
+            </div>
+          </div>
+        </div>
+        
+        {% endfor %}
+      </div>
+    </div>
+    <div class="row margin_top_30">
+      <div class="col-md-12 margin_top_30">
+        <div class="heading" style="padding-left: 15px; padding-right: 15px">
+          <h4>Post : Your Comment</h4>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="full comment_form">
+          <fieldset>
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-6">
+                  <input
+                    type="text"
+                    id="comment_field"
+                    placeholder="Comment"
+                    required="#"
+                  />
+                  <input hidden type="text" value="{{blog.postId}}" name="id" />
+                </div>
+              </div>
+              <div class="row margin_top_30">
+               
+                <div class="col-md-12">
+                  <div>
+                    <input
+                      hidden
+                      type="text"
+                      id="postId"
+                      value="{{blog.postId}}"
+                      hidden
+                    />
+
+                    <button onClick="comment()" type="submit">Comment</button>
+
+                    <input
+                      type="text"
+                      name="profileId"
+                      value="{{blog.profile.profileId}}"
+                      hidden
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+{% block js %}
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+<script>
+    //SHOW ALL LIKES
+    const showAllLikes=(id)=>{
+    const likes_list=document.getElementById("likes_list")
+    axios
+      .post(`http://localhost:8000/blog/all_likes/${id}`)
+      .then((response) => {
+        likes_list.innerHTML=''
+        list_of_likes=JSON.parse(JSON.parse(response.data.likes))
+        for(let i=0;i<list_of_likes.length;i++){
+          likes_list.innerHTML+=
+          
+          `
+          <li class="list-group-item">${list_of_likes[i].fields.username}</li>
+          `
+          
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+  </script>
+
+
+<script >
+    // UPDATE REPLY 
+    const updateReply = (id) => {
+      console.log(id)
+
+    axios.post(`http://localhost:8000/blog/updatereply/${id}`,{
+      'reply':document.getElementById(`updateReplyField${id}`).value
+    })
+    .then((response)=>{
+
+      document.getElementById(`actualReply${id}`).innerHTML=response.data.reply
+      document.getElementById(`exampleModalCenter${id}`).className="modal fade"
+      document.querySelector(".modal-backdrop").className="modal-backdrop fade"
+    
+    })
+    .catch((error)=>{
+      console.log(error)
+    })
+  
+  };
+</script>
+
+<script type="text/javascript" src="{% static 'js/blog.js' %}"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+{% endblock %}

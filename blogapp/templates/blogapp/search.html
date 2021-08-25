@@ -1,0 +1,88 @@
+{% extends 'blogapp/base.html' %} {%load static %} {% block title %}
+<title>Search</title>
+{% endblock %} {% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/search.css' %}" />
+{% endblock %} {% block content %}
+<div style="padding: 30px" class="Blog-bg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="Blogheading">
+          <h3></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="search_body">
+  <div class="search_bar">
+    <input id="search" type="text" placeholder="Search" required />
+    <button id="search_button" class="search_button">
+      <i style="font-size: 2.3rem" class="large material-icons" type="submit"
+        >search</i
+      >
+    </button>
+  </div>
+
+  <div id="search_list" class="search_list"></div>
+</div>
+
+{% endblock %} {% block js %}
+
+<script>
+  axios.defaults.xsrfCookieName = "csrftoken";
+  axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
+  document.getElementById("search_button").addEventListener("click", () => {
+    const username = document.getElementById("search").value;
+    document.getElementById("search_list").innerHTML = "";
+    axios
+      .post("http://localhost:8000/blog/searchAPI/", {
+        username: document.getElementById("search").value,
+      })
+      .then((response) => {
+        const users = response.data.results;
+        console.log(users.length);
+        for (i = 0; i < users.length; i++) {
+          document.getElementById("search_list").innerHTML += `
+
+    <div
+      style="
+        color: black;
+        margin-top: 10px;
+        padding: 10px;
+        border-top: 1px solid rgb(129, 126, 126);
+        border-bottom: 1px solid rgb(129, 126, 126);
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        width: 25%;
+      "
+    >
+    <a href="/blog/profile/${users[i][2]}">
+      <img
+        style="
+          vertical-align: middle;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+        "
+        src="${users[i][1]}"
+        alt="Avatar"
+        class="avatar"
+      />
+      ${users[i][0]}
+      
+      </a>
+    </div>
+
+            `;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,325 @@
+{% extends 'blogapp/base.html' %} {%load static %} {% block title %}
+<title>Home</title>
+{% endblock %} {% block content %} {% block css %}
+<style>
+  ul {
+    list-style-type: none;
+  }
+
+  @media only screen and (max-width: 600px) {
+    .items-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  /* .item {
+	 width: 10rem;
+	 height: 10rem;
+	 display: flex;
+	 flex-direction: column;
+	 align-items: center;
+	 justify-content: center;
+	 color: var(--greyDark);
+	 cursor: pointer;
+} */
+  .item span {
+    background: #fff;
+    box-shadow: 0 0.8rem 2rem rgba(90, 97, 129, 0.05);
+    border-radius: 0.6rem;
+    padding: 2rem;
+    font-size: 3rem;
+    transition: all 0.3s ease;
+  }
+  .item:hover span {
+    transform: scale(1.2);
+    color: var(--primary);
+  }
+  .item p {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    color: var(--greyLight);
+  }
+  .page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0.6rem;
+    background: #fff;
+    box-shadow: 0 0.8rem 2rem rgba(90, 97, 129, 0.05);
+  }
+  .page__numbers,
+  .page__btn,
+  .page__dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.8rem;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: white;
+  }
+  .page__dots {
+    width: 2.6rem;
+    height: 2.6rem;
+    color: var(--greyLight);
+    cursor: initial;
+  }
+  .page__numbers {
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 0.4rem;
+    background-color: #23adad;
+  }
+
+  .page__numbers.active {
+    color: #fff;
+    background: var(--primary);
+    font-weight: 600;
+    border: 1px solid var(--primary);
+  }
+  .page__btn {
+    color: var(--greyLight);
+    pointer-events: none;
+  }
+  .page__btn.active {
+    color: var(--greyDark);
+    pointer-events: initial;
+  }
+  .page__btn.active:hover {
+    color: var(--primary);
+  }
+</style>
+{% endblock %}
+
+<!-- section -->
+
+<div class="section layout_padding" >
+  <div style="margin-top: 60px" class="container">
+    <div>
+      <div class="row">
+        <div class="col-md-12">
+          <!-- <div class="heading">
+            <h4>Unpopular <span class="orange_color">Opinions</span></h4>
+          </div> -->
+        </div>
+      </div>
+    </div>
+    {% for post in page_obj.object_list %}
+    <div style="margin-top: 30px;display: flex;align-items: center;flex-direction: column" class="row">
+      <div class="col-md-6">
+        <a href="{% url 'blog' id=post.postId %}">
+          <img src="{{post.imageURL}}" alt="#" />
+        </a>
+      </div>
+      <div class="col-md-6">
+        <div class="full blog_cont">
+          <div style="display: flex; align-items: center">
+            <div>
+              <a href="{% url 'profile' post.profile.user.id %}">
+                <img
+                  style="width: 50px; height: 50px; border-radius: 50%"
+                  src="{{post.profile.image}}"
+                  alt="Avatar"
+                  class="avatar"
+                />
+              </a>
+            </div>
+
+            <div
+              
+            >
+             
+              <small style="margin-left: 10px;">@{{post.profile.user.username}}</small>
+            </div>
+          </div>
+          <!-- <h5>MAY 14 2019 5 READ</h5> -->
+          {{post.created_at}}
+          <div style="font-size: 20px">{{post.title|safe}}</div>
+          <hr/>
+          <p>{{post.blog|truncatechars_html:300|safe}}</p>
+          <hr />
+          
+        </div>
+
+      
+            <div id="likesof{{post.postId}}">
+              {% if user in post.likes.all %}
+
+              <button
+                onClick="postUnlike('{{post.postId}}')"
+                style="background-color: white"
+              >
+                <img
+                  style="width: 30px; height: 30px"
+                  src="/media/icons/redheart.png"
+                />
+              </button>
+
+              {%else%}
+
+              <button
+                onClick="postLike('{{post.postId}}')"
+                style="background-color: white"
+              >
+                <img
+                  style="width: 30px; height: 30px"
+                  src="/media/icons/heart.png"
+                />
+              </button>
+
+              {%endif%}
+              <!-- <input hidden type="text" value="{{post.postId}}" name="postId" /> -->
+              
+            </div>
+           
+
+                      
+      
+
+
+
+          <div style="display: flex; justify-content: flex-start">
+              <p>
+                <span id="likeslength{{post.postId}}">{{post.likeslength}}</span>
+                likes.
+              </p>
+            </div> 
+
+            <div>
+              <img
+              style="width: 30px; height: 30px"
+              src="/media/icons/message.png"
+            />
+            </div>
+
+            <div style="display: flex; justify-content: flex-start">
+              <p>
+                <span>{{post.comments_length}}</span>
+                comments.
+              </p>
+            </div> 
+
+      </div>
+    </div>
+   
+    <hr/>
+    {% endfor %}
+   
+  </div>
+</div>
+
+<div>
+  <ul class="page">
+    {%if page_obj.has_previous %}
+    <a href="?page={{page_obj.previous_page_number}}">
+      <li class="page__btn"><span class="material-icons"><<</span></li></a
+    >
+    <a href="?page={{page_obj.number|add:-1}}">
+    <li class="page__numbers"> {{page_obj.number|add:-1}} </li>
+    </a>
+    {% endif %}
+    <!--  -->
+    
+    <a href="?page={{page_obj.number}}">
+    <li class="page__numbers">{{page_obj.number}}</li>
+    </a>
+
+    {%if page_obj.has_next %}
+
+    <a href="?page={{page_obj.number|add:1}}">
+    <li class="page__numbers"> {{page_obj.number|add:1}} </li>
+    </a>
+
+    <a href="?page={{page_obj.next_page_number}}">
+      <li class="page__btn"><span class="material-icons">>></span></li>
+    </a>
+    {% endif %}
+  </ul>
+</div>
+
+<!-- end section -->
+
+{% endblock %} {% block js %}
+
+<script>
+  
+</script>
+<script>
+  axios.defaults.xsrfCookieName = "csrftoken";
+  axios.defaults.xsrfHeaderName = "X-CSRFToken";
+
+  const postLike = (id) => {
+
+          document.getElementById(`likesof${id}`).innerHTML = `
+              <button onClick="postUnlike('${id}')"  style="background-color: white">
+                <img
+                  style="width: 30px; height: 30px"
+                  src="/media/icons/redheart.png"
+                />
+              </button>
+        
+      `;
+
+      document.getElementById(`likeslength${id}`).innerHTML++;
+
+    axios
+      .post(`http://localhost:8000/blog/like/${id}`)
+      .then((response) => {
+        if (response.data.liked) {
+      //     document.getElementById(`likesof${id}`).innerHTML = `
+      //         <button onClick="postUnlike('${id}')"  style="background-color: white">
+      //           <img
+      //             style="width: 30px; height: 30px"
+      //             src="/media/icons/redheart.png"
+      //           />
+      //         </button>
+      // `;
+      //     document.getElementById(`likeslength${id}`).innerHTML++;
+
+          //CHAT SOCKET
+          // const chatSocket = new WebSocket(
+          //   "ws://" + window.location.host + "/ws/notifications/"
+          // );
+
+          // chatSocket.onmessage = (e) => {
+          //   console.log(e.data);
+          // };
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const postUnlike = (id) => {
+    document.getElementById(`likesof${id}`).innerHTML = `
+              <button onClick="postLike('${id}')"  style="background-color: white">
+                <img
+                  style="width: 30px; height: 30px"
+                  src="/media/icons/heart.png"
+                />
+              </button>
+           
+      `;
+          document.getElementById(`likeslength${id}`).innerHTML--;
+    axios
+      .post(`http://localhost:8000/blog/unlike/${id}`)
+      .then((response) => {
+        if (response.data.liked == false) {
+      //     document.getElementById(`likesof${id}`).innerHTML = `
+      //         <button onClick="postLike('${id}')"  style="background-color: white">
+      //           <img
+      //             style="width: 30px; height: 30px"
+      //             src="/media/icons/heart.png"
+      //           />
+      //         </button>
+           
+      // `;
+      //     document.getElementById(`likeslength${id}`).innerHTML--;
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+</script>
+{% endblock %}

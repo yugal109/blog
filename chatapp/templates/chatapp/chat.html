@@ -1,0 +1,267 @@
+{% extends 'blogapp/base.html' %} {%load static %} {% load post_tags %} {% block title %}
+<title>Message</title>
+{% endblock %} {% block css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}" />
+{% endblock %} {% block content %}
+<div class="Blog-bg">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="Blogheading">
+          <h3></h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- section -->
+<div
+  style="
+    height: 130vh;
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    padding: 20px;
+  "
+>
+  <div
+    style="width: 90rem; height: 800px; margin-top: 50px"
+    class="blog_cont_2"
+  >
+    <input value="{{user.id}}" id="userid" hidden />
+    <div style="display: flex; align-items: center">
+      <a href="{% url 'profile' friend.user.id %}">
+        <img
+          src="{{friend.image}}"
+          alt="Avatar"
+          style="
+            vertical-align: middle;
+            width: 80px;
+            height: 80px;
+            margin-right: 5px;
+            border-radius: 50%;
+          "
+        />
+      </a>
+
+      <h3>{{friend.user.username}}</h3>
+    </div>
+    <hr />
+
+    <div id="message_box" style="height: 550px; overflow-y: scroll">
+      {% for message in messages %} {% ifequal message.messeger.user.id user.id%}
+
+      <div style="display: flex; justify-content: flex-end; cursor: pointer">
+        <div
+          onClick="reactionInMessage('{{message.messageId}}')"
+          id="my_message"
+          style="display: flex; align-items: center"
+        >
+          <div id="reactedInMessageId{{message.messageId}}">
+            {% getMyReaction message.messageId user %}
+          </div>
+
+          <div
+            style="
+              border: 1px solid black;
+              border-radius: 10px;
+              margin-top: 10px;
+              margin-right: 7px;
+              padding: 10px;
+              width: fit-content;
+            "
+          >
+            {{message.message}}
+          </div>
+          <img
+            src="{{message.messeger.image}}"
+            alt="Avatar"
+            style="
+              vertical-align: middle;
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+            "
+          />
+        </div>
+      </div>
+
+      {% else %}
+      <div style="display: flex; align-items: center; cursor: pointer;margin-bottom:10px">
+        <div style="display: flex;float:center;">
+          <img
+            src="{{friend.image}}"
+            alt="Avatar"
+            style="
+              vertical-align: middle;
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+            "
+          />
+          <div>
+            <div
+              ondblclick="reactionToMessage('{{message.messageId}}','love')"
+              style="
+                border: 1px solid red;
+                border-radius: 10px;
+                margin-top: 10px;
+                margin-left: 7px;
+                padding: 10px;
+                width: fit-content;
+              "
+            >
+              {{message.message}}
+            </div>
+            <div style="margin-left: 10px;margin-top:-10px" id="reactedInMessageId{{message.messageId}}">
+              {% getMyReaction message.messageId user %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% endifequal %} {% endfor %}
+    </div>
+    <hr />
+    <div style="display: flex; align-items: center; margin-bottom: 20px">
+      <input id="msgfield" type="text" placeholder="Message" />
+      <button id="sendMessage" class="sendButton">Send</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block js %}
+
+<script>
+  room = window.location.pathname;
+  roomId = room.split("/");
+  const socket = new WebSocket(
+    "ws://" + window.location.host + "/ws/chat/" + roomId[3]
+  );
+
+  socket.onmessage = (e) => {
+    console.log(e.data);
+    message = JSON.parse(e.data).message;
+    userid = JSON.parse(e.data).userid;
+    useridfrompage = document.getElementById("userid").value;
+    reaction = JSON.parse(e.data).reaction;
+    messageId = JSON.parse(e.data).messageId;
+    imageurl = JSON.parse(e.data).imageurl;
+    console.log(messageId);
+
+    if (reaction == true) {
+      document.getElementById(
+        `reactedInMessageId${messageId}`
+      ).innerHTML = `<i style="color:red" class="material-icons">favorite</i>`;
+    } else if (reaction == false) {
+      document.getElementById(`reactedInMessageId${messageId}`).innerHTML = ``;
+    } else {
+    }
+
+    if (message && userid && useridfrompage) {
+      if (userid == useridfrompage) {
+        document.getElementById("message_box").innerHTML += `
+
+      <div  style="display: flex; justify-content: flex-end;cursor: pointer;">
+        
+        <div
+        
+          id="my_message"
+          style="display: flex; align-items: center"
+        >
+          <div
+            style="
+              border: 1px solid black;
+              border-radius: 10px;
+              margin-top: 10px;
+              margin-right: 7px;
+              padding: 10px;
+              width: fit-content;
+            "
+          >
+          ${message}
+          </div>
+          <img
+            src="${imageurl}"
+            alt="Avatar"
+            style="
+              vertical-align: middle;
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+            "
+          />
+        </div>
+      </div>
+`;
+      } else {
+        document.getElementById("message_box").innerHTML += `
+        <div style="display: flex; align-items: center; cursor: pointer">
+        <div style="display: flex;float:center;">
+          <img
+            src="${imageurl}"
+            alt="Avatar"
+            style="
+              vertical-align: middle;
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+            "
+          />
+          <div>
+            <div
+              ondblclick="reactionToMessage('${messageId}','love')"
+              style="
+                border: 1px solid red;
+                border-radius: 10px;
+                margin-top: 10px;
+                margin-left: 7px;
+                padding: 10px;
+                width: fit-content;
+              "
+            >
+              ${message}
+            </div>
+            <div style="margin-left: 10px;margin-top:-10px" id="reactedInMessageId${messageId}">
+             
+            </div>
+          </div>
+        </div>
+      </div>
+`;
+      }
+    }
+
+    document.getElementById("msgfield").value = "";
+  };
+
+  socket.onclose = function (e) {
+    console.error("Chat socket closed unexpectedly");
+  };
+
+  socket.onerror = (err) => {
+    console.log(err);
+  };
+
+  document.getElementById("sendMessage").addEventListener("click", () => {
+    socket.send(
+      JSON.stringify({ message: document.getElementById("msgfield").value })
+    );
+  });
+
+  const reactionToMessage = (id, reaction_type) => {
+    socket.send(
+      JSON.stringify({ messageId: id, reaction_type: reaction_type })
+    );
+  };
+</script>
+
+<script>
+  const sendMessage = () => {
+    // axios.defaults.xsrfCookieName = "csrftoken";
+    // axios.defaults.xsrfHeaderName = "X-CSRFToken";
+  };
+</script>
+
+{% endblock %}
